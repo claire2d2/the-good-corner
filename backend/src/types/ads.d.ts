@@ -7,4 +7,3 @@ export type Ad = {
     picture: string;
     location: string;
 };
-
