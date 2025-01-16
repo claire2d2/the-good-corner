@@ -26,6 +26,20 @@ export default class AdService {
     }
 
     findAdById(id: string){
+        const adExists = adsList.find((ad) => ad.id === id);
+        console.log(adExists)
+        if (!adExists) {
+            throw new Error ("The ad doesn't exist")
+        }
         return adsList.find(((ad) => ad.id === id))
+    }
+
+    create(ad: Ad) {
+        const adExists = adsList.some((a) => a.id === ad.id);
+        if (adExists) {
+            throw new Error("The ad already exists")
+        }
+        adsList.push(ad)
+        return ad;
     }
 }
