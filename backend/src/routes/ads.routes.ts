@@ -54,24 +54,24 @@ router.delete("/delete/:id", async (req, res) => {
 	}
 });
 
-router.patch("/update/:id", (req, res) => {
-	// const { id } = req.params;
-	// const { title, description, picture, location, price }: AdWithoutId<Ad> =
-	// 	req.body;
-	// const ad = {
-	// 	id,
-	// 	title,
-	// 	description,
-	// 	picture,
-	// 	location,
-	// 	price,
-	// };
-	// try {
-	// 	const updatedAd = new AdService().update(id, ad);
-	// 	res.status(201).send(updatedAd);
-	// } catch (error: any) {
-	// 	res.status(404).send({ message: error.message });
-	// }
+router.patch("/update/:id", async (req, res) => {
+	const { id } = req.params;
+	const { title, description, picture, location, price }: AdWithoutId<Ad> =
+		req.body;
+	const ad = {
+		id,
+		title,
+		description,
+		picture,
+		location,
+		price,
+	};
+	try {
+		const updatedAd = await new AdService().update(id, ad);
+		res.status(201).send("success");
+	} catch (error: any) {
+		res.status(404).send({ message: error.message });
+	}
 });
 
 export default router;
