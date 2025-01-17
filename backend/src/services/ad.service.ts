@@ -1,6 +1,6 @@
-import { Ad } from "../types/ads";
+import { Ad, AdWithoutId } from "../types/ads";
 
-const adsList: Ad[] = [
+let adsList: Ad[] = [
 	{
 		id: "1",
 		title: "titre 1",
@@ -27,7 +27,6 @@ export default class AdService {
 
     findAdById(id: string){
         const adExists = adsList.find((ad) => ad.id === id);
-        console.log(adExists)
         if (!adExists) {
             throw new Error ("The ad doesn't exist")
         }
@@ -41,5 +40,23 @@ export default class AdService {
         }
         adsList.push(ad)
         return ad;
+    }
+
+    delete(id: string) {
+        const ad = this.findAdById(id);
+        adsList = adsList.filter((a) => a.id !== ad?.id)
+        return ad?.id
+    }
+
+    update(id: string, ad: AdWithoutId<Ad>) {
+        let adToUpdate = this.findAdById(id)
+        // if identical keys, the keys will be replaced by the last one
+        // adToUpdate = {...adToUpdate, ...ad}
+        Object.keys(ad).forEach((k) => {
+            if(ad[k] && adToUpdate) {
+                adToUpdate[k] = ad[k]
+            }
+        })
+        return adToUpdate
     }
 }

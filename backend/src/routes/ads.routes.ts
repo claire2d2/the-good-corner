@@ -1,6 +1,6 @@
 import { Router } from "express";
 import AdService from "../services/ad.service";
-import { Ad } from "../types/ads";
+import { Ad, AdWithoutId } from "../types/ads";
 
 const router = Router();
 
@@ -21,7 +21,6 @@ router.get("/find/:id", (req, res) => {
 
 // missing express validator
 router.post("/create", (req, res) => {
-    console.log("Received body:", req.body); 
     const {id, title, description, picture, location, price}: Ad = req.body
     const ad = {
         id,
@@ -38,6 +37,35 @@ router.post("/create", (req, res) => {
     } catch (error: any) {
         res.status(500).send({message: error.message})
     }
+})
+
+router.delete("/delete/:id", (req, res) => {
+    const { id } = req.params
+    try {
+        const deletedAd = new AdService().delete(id)
+        res.status(201).send(deletedAd)
+    } catch (error:any) {
+        res.status(404).send({message: error.message})
+    }
+})
+
+router.patch("/update/:id", (req, res) => {
+    const { id } = req.params
+    const { title, description, picture, location, price} : AdWithoutId<Ad> = req.body
+    const ad = {
+        id,
+        title,
+        description,
+        picture,
+        location, 
+        price
+    };
+    try {
+        const updatedAd = new AdService().update(id, ad)
+        res.status(201).send(updatedAd)
+    } catch (error: any) {
+        res.status(404).send({message: error.message})
+    } 
 })
 
 
