@@ -1,25 +1,6 @@
 import { Ad, AdWithoutId } from "../types/ads";
 import sqlite3 from "sqlite3";
 
-let adsList: Ad[] = [
-	{
-		id: "1",
-		title: "titre 1",
-		description: "description 1",
-		price: 15.0,
-		picture: "",
-		location: "Toulouse",
-	},
-	{
-		id: "2",
-		title: "titre 2",
-		description: "description 2",
-		price: 30.0,
-		picture: "",
-		location: "Toulouse",
-	},
-];
-
 export default class AdService {
 	db: sqlite3.Database;
 
