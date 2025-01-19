@@ -9,7 +9,7 @@ router.get("/list", async (req, res) => {
 		const adsList = await new AdService().listAds();
 		res.status(200).send(adsList);
 	} catch (error: any) {
-		res.status(404).send({ message: error.message });
+		res.status(404).send({ message: error });
 	}
 });
 
