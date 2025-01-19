@@ -1,6 +1,9 @@
+import "reflect-metadata";
+
 import express from "express";
 import adsRouter from "./routes/ads.routes"
 import categoriesRouter from "./routes/categories.routes"
+
 
 const app = express();
 
