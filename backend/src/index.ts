@@ -17,3 +17,5 @@ app.listen(4000, async () => {
     await datasource.initialize();
     console.log("Server is launched on port 4000")
 })
+
+// stop at 1h04

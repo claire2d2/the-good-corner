@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import AdEntity from "./Ad.entity";
 
-@Entity()
+@Entity({name: "categories"})
 export default class CategoryEntity {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
