@@ -13,6 +13,17 @@ router.get("/list", async (req, res) => {
 	}
 });
 
+// possible to optimize by making limit optional and adding a ? at the end
+router.get("/find/:id", async (req, res) => {
+	const { id } = req.params
+	try {
+		const foundCat = await new CategoryService().findCatByIdWithAds(id)
+		res.status(200).send(foundCat);
+	} catch (error: any) {
+		res.status(404).send({ message: error });
+	}
+})
+
 router.post("/create", async (req, res) => {
 	const { title }: Omit<CategoryEntity, "id"> = req.body;
 	const cat = { title };

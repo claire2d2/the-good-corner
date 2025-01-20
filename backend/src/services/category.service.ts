@@ -21,6 +21,14 @@ export default class CategoryService {
 		return foundCat
 	}
 
+	async findCatByIdWithAds(id: string) {
+		const foundCat = await this.db.findCategoryByIdWithAds(id)
+		if (!foundCat) {
+			throw new Error("The ad does not exist")
+		}
+		return foundCat
+	}
+
 	async create(cat: Omit<CategoryEntity, "id">) {
         const newCat = await this.db.save({
             ...cat, 
