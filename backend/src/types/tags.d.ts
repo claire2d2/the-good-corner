@@ -1,7 +1,5 @@
-export type Tag = {
-    [key: string]: string;
-    id: string;
-    label: string;
-}
+import type TagEntity from "../entities/Tag.entity";
 
-export type TagWithoutId = Omit<Tag, [id]>
+export type TagCreateType = Omit<TagEntity, "id" | "created_at" | "updated_at">;
+
+export type TagUpdateType = Omit<TagEntity, "id">;

@@ -1,29 +1,21 @@
-export type Ad = {
-    [key: string]: string | number;
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    picture: string;
-    location: string;
+import type AdEntity from "../entities/Ad.entity";
+import type { FindOptionsOrderValue } from "typeorm";
+
+export type FilterType = {
+  limit?: number;
+  order?: FindOptionsOrderValue;
 };
 
-// for creating new ads
-export type AdCreate<T extends object> = T & {
-    [key: string]: string | number;
-    title: string,
-    description: string;
-    picture: string,
-    location: string;
-    price: number
-}
+export type AdCreateType = Omit<
+  AdEntity,
+  "id" | "created_at" | "updated_at" | "tags" | "category"
+> & {
+  tagsIds: string[];
+  categoryId: string;
+};
 
-// for updating ads
-export type AdWithoutId<T extends object> = T & {
-    [key: string]: string | number;
-    title?: string;
-    description?: string;
-    picture?: string;
-    location?: string;
-    price?: number;
-  };
+export type AdUpdateType = Partial<
+  Omit<AdEntity, "id" | "created_at" | "updated_at" | "tags" | "category"> & {
+    tagsIds: string[];
+  }
+> & { categoryId: string };
