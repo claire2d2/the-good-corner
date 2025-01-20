@@ -4,11 +4,13 @@ import {
 	PrimaryGeneratedColumn,
 	CreateDateColumn,
 	UpdateDateColumn,
-    OneToMany,
+    ManyToMany,
     ManyToOne
 } from "typeorm";
 import CategoryEntity from "./Category.entity";
 import { Category } from "../types/category";
+import { Tag } from "../types/tags";
+import TagEntity from "./Tag.entity";
 
 @Entity({ name: "ads" })
 export default class AdEntity {
@@ -32,6 +34,9 @@ export default class AdEntity {
 
     @ManyToOne(() => CategoryEntity,(category: Category) => category.ads )
     category: CategoryEntity;
+
+	@ManyToMany(() => TagEntity, (tag: Tag ) => tag.ads)
+	tags: TagEntity;
 
 	@CreateDateColumn({nullable: true})
 	created_at?: Date;
