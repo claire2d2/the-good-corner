@@ -1,6 +1,7 @@
 import { Router } from "express";
 import AdService from "../services/ad.service";
 import { Ad, AdWithoutId } from "../types/ads";
+import AdEntity from "../entities/Ad.entity";
 
 const router = Router();
 
@@ -20,20 +21,20 @@ router.get("/find/:id", async (req, res) => {
         // console.log(foundAd)
 		res.status(200).send(foundAd);
 	} catch (error: any) {
-		res.status(404).send({ message: error });
+		res.status(404).send({ message: error.message });
 	}
 });
 
 // missing express validator
 router.post("/create", async (req, res) => {
-	const { id, title, description, picture, location, price }: Ad = req.body;
+	const { title, description, picture, location, price, category }: Omit<AdEntity, "id"| "created_at" | "updated_at"> = req.body;
 	const ad = {
-		id,
 		title,
 		description,
 		picture,
 		location,
 		price,
+        category
 	};
 	try {
 		const newAd = await new AdService().create(ad);
@@ -47,8 +48,8 @@ router.post("/create", async (req, res) => {
 router.delete("/delete/:id", async (req, res) => {
 	const { id } = req.params;
 	try {
-		const deletedAd = await new AdService().delete(id);
-		res.status(201).send({success: true, message : `Ad with id ${deletedAd} has been successfully deleted`});
+		await new AdService().delete(id);
+		res.status(201).send({success: true, message : `Ad with id ${id} has been successfully deleted`});
 	} catch (error: any) {
 		res.status(404).send({ message: error });
 	}
@@ -56,7 +57,7 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.patch("/update/:id", async (req, res) => {
 	const { id } = req.params;
-	const { title, description, picture, location, price }: AdWithoutId<Ad> =
+	const { title, description, picture, location, price, category }: Omit<AdEntity, "id" | "created_at" | "updated_at"> =
 		req.body;
 	const ad = {
 		id,
@@ -65,6 +66,7 @@ router.patch("/update/:id", async (req, res) => {
 		picture,
 		location,
 		price,
+		category
 	};
 	try {
 		const updatedAd = await new AdService().update(id, ad);

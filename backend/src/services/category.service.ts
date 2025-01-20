@@ -1,67 +1,48 @@
 import { Category, CategoryWithoutId } from "../types/category";
-import sqlite3  from "sqlite3";
+import CategoryRepository from "../repositories/Category.repository";
+import CategoryEntity from "../entities/Category.entity";
 
 export default class CategoryService {
+	db: CategoryRepository;
 
-    db: sqlite3.Database;
-    
-        constructor() {
-            this.db = new sqlite3["Database"]("good_corner.sqlite");
+	constructor() {
+		this.db = new CategoryRepository();
+	}
+
+	async listCategories() {
+        return await this.db.find();
+	}
+
+	async findCatById(id: string) {
+		const foundCat = await this.db.findOne({where: {id}})
+		if (!foundCat) {
+			throw new Error("The ad does not exist")
+		}
+		return foundCat
+	}
+
+	async create(cat: Omit<CategoryEntity, "id">) {
+        const newCat = await this.db.save({
+            ...cat, 
+        })
+        return newCat;
+	}
+
+	async update(id: string, cat: CategoryWithoutId) {
+		const CatToUpdate = await this.findCatById(id)
+        if (!CatToUpdate) {
+            throw new Error("This ad does not exist")
         }
+        const updatedAd = this.db.merge(CatToUpdate, cat)
+        return updatedAd
+	}
+	
 
-        listCategories() {
-            return new Promise<Category[]>((resolve, reject) => {
-                        this.db.all<Category>("SELECT * from categories", (err, rows) => {
-                            if (err) {
-                                reject(err.message);
-                            }
-                            resolve(rows);
-                        });
-                    });
-        }
-
-        create(cat: Category) {
-            return new Promise<Category>((resolve, reject) => {
-                this.db.run(
-                    "INSERT INTO categories (id, title) VALUES (?, ?)",
-                    [cat.id, cat.title],
-                    (err: any) => {
-                        if (err) {
-                            reject(err.message);
-                        }
-                        resolve({...cat});
-                    }
-                );
-            });
-        }
-
-        update(id: string, cat: CategoryWithoutId) {
-            return new Promise((resolve, reject) => {
-                this.db.run("UPDATE categories SET title = ? WHERE id = ?", [cat.title, id], function(err) {
-                    if (err) {
-                        reject(err.message)
-                    }
-                    if (this.changes === 0) {
-                        reject ("The category doesn't exist")
-                    }
-                    resolve(id)
-                })
-            })
-        }
-
-        delete(id: string) {
-            return new Promise((resolve, reject) => {
-                this.db.run("DELETE categories WHERE id = ?", [id], function(err) {
-                    if (err) {
-                        reject (err.message)
-                    }
-                    if (this.changes === 0) {
-                        reject ("The category doesn't exist")
-                    }
-                    resolve(id)
-                })
-            })
-        }
-    
-
+	async delete(id: string) {
+		const deletedCat = await this.db.delete({id})
+		if (deletedCat.affected === 0) {
+			throw new Error("This ad does not exist")
+		}
+		return deletedCat
+	}
 }

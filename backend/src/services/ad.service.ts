@@ -1,116 +1,49 @@
-import { Ad, AdWithoutId } from "../types/ads";
-import sqlite3 from "sqlite3";
+import AdRepository from "../repositories/Ad.repository";
+import CategoryService from "./category.service";
+import AdEntity from "../entities/Ad.entity";
 
 export default class AdService {
-	db: sqlite3.Database;
+	db: AdRepository;
 
 	constructor() {
-		this.db = new sqlite3["Database"]("good_corner.sqlite");
+		this.db = new AdRepository();
 	}
 
+    // typeORM does the Promise for us
+
 	async listAds() {
-		return new Promise<Ad[]>((resolve, reject) => {
-			this.db.all<Ad>("SELECT * from ads", (err, rows) => {
-				if (err) {
-					reject(err.message);
-				}
-				resolve(rows);
-			});
-		});
+        return await this.db.find({relations: ["category"]});
 	}
 
 	async findAdById(id: string) {
-		return new Promise<Ad>((resolve, reject) => {
-			this.db.get<Ad>("SELECT * FROM ads WHERE id = (?)", [id], (err, row) => {
-				if (err) {
-					reject(err.message);
-				}
-				if (!row) {
-					reject(`Ad with id ${id} not found.`);
-				}
-				resolve(row);
-			});
-		});
+		const foundAd = await this.db.findOne({where: {id}})
+		if (!foundAd) {
+			throw new Error("The ad does not exist")
+		}
+		return foundAd
 	}
 
-	create(ad: Ad) {
-		return new Promise<Ad>((resolve, reject) => {
-			this.db.run(
-				"INSERT INTO ads (id, title, description, price, picture, location) VALUES (?, ?, ?, ?, ?, ?)",
-				[ad.id, ad.title, ad.description, ad.price, ad.picture, ad.location],
-				(err: any) => {
-					if (err) {
-						reject(err.message);
-					}
-					resolve({...ad});
-				}
-			);
-		});
-	}
-
-    async delete(id: string) {
-        return new Promise<string>((resolve, reject) => {
-            this.db.run("DELETE FROM ads where id = (?)", [id], function (err: any) {
-                if(err) {
-                    reject(err.message)
-                }
-                if (this.changes === 0) {
-                    reject("The ad does not exist")
-                }
-                resolve(id)
-            })
+	async create(ad: Omit<AdEntity, "id">) {
+        const newAd = await this.db.save({
+            ...ad, 
         })
-    }
+        return newAd;
+	}
 
-    async update(id: string, ad: AdWithoutId<Ad>) {
-        return new Promise<Ad>(async (resolve, reject) => {
-            try {
-              const adFound = await this.findAdById(id);
-              Object.keys(ad).forEach((k) => {
-                //title, description, picture, location, price
-                if (ad[k]) {
-                  // si title n'est pas undefined :  if ad.title
-                  adFound[k] = ad[k]; // title de l'annonce trouvée est égal au titre reçu adFound.title = ad.title
-                }
-              });
-              this.db.run(
-                "UPDATE ads SET title = ?, description = ?, picture = ?, location = ?, price = ? WHERE id = ?",
-                [
-                  adFound.title,
-                  adFound.description,
-                  adFound.picture,
-                  adFound.location,
-                  adFound.price,
-                  id,
-                ],
-                function (err) {
-                  if (err) {
-                    reject(err.message);
-                  }
-                  if (this.changes === 0) {
-                    reject("The ad doesn't exist");
-                  }
-      
-                  resolve(adFound);
-                }
-              );
-            } catch (err) {
-              reject(err);
-            }
-          });
-    }
+	async delete(id: string) {
+		const deletedAd = await this.db.delete({id})
+		if (deletedAd.affected === 0) {
+			throw new Error("This ad does not exist")
+		}
+		return deletedAd
+	}
+
+	async update(id: string, ad: AdEntity) {
+        const AdToUpdate = await this.findAdById(id)
+        if (!AdToUpdate) {
+            throw new Error("This ad does not exist")
+        }
+        const updatedAd = this.db.merge(AdToUpdate, ad)
+        return updatedAd
+	}
 }
-
-
-// update(id: string, ad: AdWithoutId<Ad>) {
-// let adToUpdate = this.findAdById(id)
-// // if identical keys, the keys will be replaced by the last one
-// // adToUpdate = {...adToUpdate, ...ad}
-// Object.keys(ad).forEach((k) => {
-//     if(ad[k] && adToUpdate) {
-//         adToUpdate[k] = ad[k]
-//     }
-// })
-// return adToUpdate
-// }
-// }

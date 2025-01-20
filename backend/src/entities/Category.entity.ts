@@ -16,12 +16,12 @@ export default class CategoryEntity {
 	@Column({ unique: true })
 	title: string;
 
-    @OneToMany(() => AdEntity, (ad) => ad.category)
-    ads: AdEntity[]
+    @OneToMany(() => AdEntity, (ad) => ad.category, {nullable: true})
+    ads?: AdEntity[]
 
-	@CreateDateColumn()
-	created_at: Date;
+	@CreateDateColumn({nullable: true})
+	created_at?: Date;
 
-	@UpdateDateColumn()
-	updated_at: Date;
+	@UpdateDateColumn({nullable: true})
+	updated_at?: Date;
 }

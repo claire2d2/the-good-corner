@@ -1,6 +1,6 @@
 import { Router } from "express";
 import CategoryService from "../services/category.service";
-import { Category } from "../types/category";
+import CategoryEntity from "../entities/Category.entity";
 
 const router = Router();
 
@@ -14,8 +14,8 @@ router.get("/list", async (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
-	const { id, title }: Category = req.body;
-	const cat = { id, title };
+	const { title }: Omit<CategoryEntity, "id"> = req.body;
+	const cat = { title };
 	try {
 		const createdCat = await new CategoryService().create(cat);
 		res
