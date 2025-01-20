@@ -27,14 +27,15 @@ router.get("/find/:id", async (req, res) => {
 
 // missing express validator
 router.post("/create", async (req, res) => {
-	const { title, description, picture, location, price, category }: Omit<AdEntity, "id"| "created_at" | "updated_at"> = req.body;
+	const { title, description, picture, location, price, category, tags }: Omit<AdEntity, "id"| "created_at" | "updated_at"> = req.body;
 	const ad = {
 		title,
 		description,
 		picture,
 		location,
 		price,
-        category
+        category,
+		tags: tags ?? []
 	};
 	try {
 		const newAd = await new AdService().create(ad);
@@ -57,7 +58,7 @@ router.delete("/delete/:id", async (req, res) => {
 
 router.patch("/update/:id", async (req, res) => {
 	const { id } = req.params;
-	const { title, description, picture, location, price, category }: Omit<AdEntity, "id" | "created_at" | "updated_at"> =
+	const { title, description, picture, location, price, category, tags }: Omit<AdEntity, "id" | "created_at" | "updated_at"> =
 		req.body;
 	const ad = {
 		id,
@@ -66,7 +67,8 @@ router.patch("/update/:id", async (req, res) => {
 		picture,
 		location,
 		price,
-		category
+		category, 
+		tags
 	};
 	try {
 		const updatedAd = await new AdService().update(id, ad);

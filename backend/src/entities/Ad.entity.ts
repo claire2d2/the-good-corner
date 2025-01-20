@@ -5,7 +5,8 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
     ManyToMany,
-    ManyToOne
+    ManyToOne,
+	JoinTable
 } from "typeorm";
 import CategoryEntity from "./Category.entity";
 import { Category } from "../types/category";
@@ -35,8 +36,14 @@ export default class AdEntity {
     @ManyToOne(() => CategoryEntity,(category: Category) => category.ads )
     category: CategoryEntity;
 
-	@ManyToMany(() => TagEntity, (tag: Tag ) => tag.ads)
-	tags: TagEntity;
+	@ManyToMany(() => TagEntity)
+	@JoinTable({
+		name: "ads_tags",
+		joinColumn: { name: "ad_id"},
+		inverseJoinColumn: { name: "tag_id" }
+
+	})
+	tags: TagEntity[];
 
 	@CreateDateColumn({nullable: true})
 	created_at?: Date;

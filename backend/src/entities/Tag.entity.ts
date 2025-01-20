@@ -17,10 +17,8 @@ export default class TagEntity {
 	id: string;
 
 	@Column({ unique: true })
+    // add transformer to everything?
 	label: string;
-
-    @ManyToMany(() => AdEntity, (ad: Ad) => ad.tags)
-    ads: AdEntity;
 
     @CreateDateColumn({nullable: true})
 	created_at?: Date;
