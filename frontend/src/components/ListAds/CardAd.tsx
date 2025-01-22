@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Ad } from "../../types/Ad"
 
 type CardAdProps = {
@@ -14,6 +15,7 @@ const CardAd:React.FC<CardAdProps>  = ({ad}) => {
         <span>Price: </span>
         {ad.price}
         </div>
+        <Link to={`ads/${ad.id}`}>See details</Link>
     </div>
   )
 }

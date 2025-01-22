@@ -19,6 +19,9 @@ const ListAds = () => {
 		getAds();
 	}, []);
 
+    //
+
+   
         
     if (isLoading) {
         return <div>Loading...</div>
@@ -31,7 +34,7 @@ const ListAds = () => {
 	return (
 		<div className="grid grid-cols-2">
 			{adsList?.map((ad) => {
-				return <CardAd key={ad.id} ad={ad} />;
+				return <CardAd key={ad.id} ad={ad}/>;
 			})}
 		</div>
 	);
