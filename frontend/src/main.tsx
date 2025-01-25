@@ -18,13 +18,13 @@ const router = createBrowserRouter([
       element: <Home/>,
     },
   {
-    path: "/ads/:id", element: <OneAd />
+    path: "/ads/view/:id", element: <OneAd />
   },
 { 
   path: "/ads/create", element: <CreateAd/>
 },
 {
-  path:"/ads/edit", element: <EditAd/>
+  path:"/ads/edit/:id", element: <EditAd/>
 }]
   }
   // add a 404
