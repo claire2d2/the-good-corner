@@ -2,13 +2,7 @@ import AdEntity from "../entities/Ad.entity";
 import multer from "multer";
 import { AdCreateType, AdUpdateType, FilterType } from "../types/ads";
 import { Response, Router } from "express";
-import {
-  ApiResponse,
-  RequestWithBodyAndFile,
-  RequestWithParams,
-  RequestWithParamsBodyAndFile,
-  RequestWithQuery,
-} from "../types/common"
+import { ApiResponse, RequestWithBodyAndFile, RequestWithParams, RequestWithParamsBodyAndFile, RequestWithQuery } from "../types/common";
 import AdService from "../services/ad.service";
 
 const router = Router();

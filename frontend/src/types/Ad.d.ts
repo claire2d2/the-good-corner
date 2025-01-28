@@ -35,3 +35,8 @@ export type Tag = {
     updated_at: string
 }
 
+export type AdCreateFormInfos = Omit<
+  ProductType,
+  "id" | "created_at" | "updated_at" | "category"
+> & { categoryId: string };
+

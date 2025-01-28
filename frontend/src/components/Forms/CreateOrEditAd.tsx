@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import instance from "../../lib/instance";
-import { Category, AdCreate, Ad } from "../../types/Ad";
+import { categoriesList } from "../../lib/requests/cats.requests";
+import { Category, AdCreateFormInfos } from "../../types/Ad";
 
 
 // TO DO: disable form submission when there are no changes
 interface FormProps {
-    editMode : boolean,
-    adData: Ad | null
+	submitCall: (formData: FormData) => Promise<void>,
+	error: string | undefined,
+	initialData : AdCreateFormInfos | null
 }
 
 // styling
@@ -15,9 +15,12 @@ const inputStyle = "border border-gray-400";
 const actionEdit = "Submit changes"
 const actionCreate = "Create new ad"
 
-const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
+const CreateOrEditAd: React.FC<FormProps> = ({error, submitCall, initialData}) => {
+	console.log(error)
 	const [cats, setCats] = useState<Category[]>([]);
-	const [formData, setFormData] = useState<AdCreate>({
+	const [file, setFile] = useState<File | null>(null)
+	const [preview, setPreview] = useState("");
+	const [data, setData] = useState<AdCreateFormInfos>(initialData || {
 		categoryId: "",
 		title: "",
 		description: "",
@@ -29,14 +32,14 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 
 	const getCategories = async () => {
 		try {
-			const { data } = await instance.get<{ result: Category[] }>(
-				`/categories/list`
-			);
+		  const data = await categoriesList();
+		  if (data.success) {
 			setCats(data.result);
-		} catch (error: unknown) {
-			console.log(error);
+		  }
+		} catch (err: any) {
+		  console.log({ err });
 		}
-	};
+	  };
 
 	useEffect(() => {
 		getCategories();
@@ -46,38 +49,34 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
 		const { name, value } = e.target;
-		setFormData((prevData) => ({ ...prevData, [name]: value }));
+		setData((prevData) => ({ ...prevData, [name]: value }));
 	};
 
-	const navigate = useNavigate();
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-        if (editMode) {
-            handleEdit()
-        }
-        else {handleCreate()}
-        
-	};
-
-
-    const handleCreate = async () => {
-        try {
-			await instance.post("/ads/create", formData);
-			navigate("/");
-		} catch (error) {
-			console.log(error);
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
+		  const selectedFile = e.target.files[0];
+		  setFile(selectedFile);
+		  setPreview(URL.createObjectURL(selectedFile));
 		}
-    }
+	  };
 
-    const handleEdit = async () => {
-        try {
-            await instance.patch(`/ads/edit/${adData?.id}`, formData);
-			navigate(`ads/${ adData?.id }`);
-        } catch (error) {
-            console.log(error);
-        }
-    }
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		const formData = new FormData();
+		if (file) {
+		  formData.append("picture", file);
+		}
+		formData.append("title", data.title);
+		formData.append("description", data.description);
+		formData.append("price", data.price.toString());
+		formData.append("location", data.location);
+		formData.append("categoryId", data.categoryId);
+		try {
+		  submitCall(formData);
+		} catch (err: any) {
+		  console.log(err);
+		}
+	  };
 
 	return (
 		<form onSubmit={handleSubmit}>
@@ -99,7 +98,7 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 				<input
 					type="text"
 					name="title"
-					value={formData.title}
+					value={data.title}
 					className={inputStyle}
 					onChange={(e) => handleChange(e)}
 					minLength={5}
@@ -110,7 +109,7 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 				<input
 					type="text"
 					name="description"
-					value={formData.description}
+					value={data.description}
 					className={inputStyle}
 					onChange={(e) => handleChange(e)}
 				/>
@@ -121,7 +120,7 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 				<input
 					type="float"
 					name="price"
-					value={formData.price}
+					value={data.price}
 					className={inputStyle}
 					onChange={(e) => handleChange(e)}
 				/>
@@ -129,19 +128,34 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 			<div>
 				<label htmlFor="picture">Picture:</label>
 				<input
-					type="text"
+					type="file"
 					name="picture"
-					value={formData.picture}
+					value={initialData?.picture || data.picture}
 					className={inputStyle}
-					onChange={(e) => handleChange(e)}
+					onChange={(e) => handleFileChange(e)}
 				/>
 			</div>
+			<div className="flex justify-center flex-col items-center">
+          <p className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Prévisualisation
+          </p>
+          {preview ? (
+            <img
+              src={preview}
+              alt="Previsualisation"
+              style={{ maxWidth: "300px", maxHeight: "300px" }}
+            />
+          ) : (
+            <div>No selected image at the moment</div>
+          )}
+        </div>
+
 			<div>
 				<label htmlFor="location">City:</label>
 				<input
 					type="text"
 					name="location"
-					value={formData.location}
+					value={data.location}
 					className={inputStyle}
 					onChange={(e) => handleChange(e)}
 				/>
@@ -149,7 +163,7 @@ const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 
 			<div>Tags</div>
         
-			<button type="submit" className="bg-black text-white disabled:bg-gray-200" >  {editMode ? actionEdit : actionCreate }</button>
+			<button type="submit" className="bg-black text-white disabled:bg-gray-200" >  {initialData ? actionEdit : actionCreate }</button>
 		</form>
 	);
 };
