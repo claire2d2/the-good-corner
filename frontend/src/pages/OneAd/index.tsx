@@ -1,18 +1,21 @@
 import { Ad } from "../../types/Ad";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import instance from "../../lib/instance";
+import { findAd } from "../../lib/requests/ads.requests";
+import defaultPic from "../../assets/picture.png"
 
 const OneAd = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [adData, setAdData] = useState<Ad | null>(null);
 
-	const { id } = useParams();
+	const params = useParams();
 
 	const getAdData = async () => {
 		try {
-			const { data } = await instance.get<{ result: Ad }>(`/ads/find/${id}`);
-			setAdData(data.result);
+			const data = await findAd(params.id!)
+			if (data.success) {
+				setAdData(data.result);
+			}
 		} catch (error: unknown) {
 			console.log(error);
 		}
@@ -21,8 +24,7 @@ const OneAd = () => {
 
 	useEffect(() => {
 		getAdData();
-		console.log(adData);
-	}, [id]);
+	}, []);
 
 	if (isLoading) {
 		return <div>Loading ...</div>;
@@ -38,6 +40,15 @@ const OneAd = () => {
 				<div>Category : {adData?.category.title}</div>
 				<div>{adData?.location}</div>
 				<div>{adData?.price} </div>
+				<img
+        src={
+          adData?.picture
+            ? `${import.meta.env.VITE_BACKEND_URL_FILES}${adData?.picture}`
+            : defaultPic
+        }
+        alt="Image"
+        style={{ maxWidth: "300px", maxHeight: "300px" }}
+      />
 			</div>
 		</div>
 	);
