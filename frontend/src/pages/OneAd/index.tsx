@@ -10,14 +10,13 @@ const OneAd = () => {
 	const { id } = useParams();
 
 	const getAdData = async () => {
-    try {
-      const { data } = await instance.get<{ result: Ad }>(`/ads/find/${id}`);
-		setAdData(data.result);
-
-    } catch (error: unknown) {
-      console.log(error)
-    }
-    setIsLoading(false);
+		try {
+			const { data } = await instance.get<{ result: Ad }>(`/ads/find/${id}`);
+			setAdData(data.result);
+		} catch (error: unknown) {
+			console.log(error);
+		}
+		setIsLoading(false);
 	};
 
 	useEffect(() => {
@@ -25,9 +24,9 @@ const OneAd = () => {
 		console.log(adData);
 	}, [id]);
 
-  if (isLoading) {
-    return <div>Loading ...</div>
-  }
+	if (isLoading) {
+		return <div>Loading ...</div>;
+	}
 	if (!adData) {
 		return <div>No ad found</div>;
 	}
@@ -35,11 +34,11 @@ const OneAd = () => {
 	return (
 		<div>
 			<h1> Title: {adData?.title}</h1>
-      <div>
-        <div>Category : {adData?.category.title}</div>
-        <div>{adData?.location}</div>
-        <div>{adData?.price} </div>
-      </div>
+			<div>
+				<div>Category : {adData?.category.title}</div>
+				<div>{adData?.location}</div>
+				<div>{adData?.price} </div>
+			</div>
 		</div>
 	);
 };
