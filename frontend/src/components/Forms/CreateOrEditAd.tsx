@@ -1,13 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../../lib/instance";
-import { Category, AdCreate } from "../../types/Ad";
+import { Category, AdCreate, Ad } from "../../types/Ad";
 
+
+// TO DO: disable form submission when there are no changes
+interface FormProps {
+    editMode : boolean,
+    adData: Ad | null
+}
 
 // styling
 const inputStyle = "border border-gray-400";
+const actionEdit = "Submit changes"
+const actionCreate = "Create new ad"
 
-const CreateOrEditAd = () => {
+const CreateOrEditAd: React.FC<FormProps> = ({editMode, adData}) => {
 	const [cats, setCats] = useState<Category[]>([]);
 	const [formData, setFormData] = useState<AdCreate>({
 		categoryId: "",
@@ -43,15 +51,34 @@ const CreateOrEditAd = () => {
 
 	const navigate = useNavigate();
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		try {
+        if (editMode) {
+            handleEdit()
+        }
+        else {handleCreate()}
+        
+	};
+
+
+    const handleCreate = async () => {
+        try {
 			await instance.post("/ads/create", formData);
 			navigate("/");
 		} catch (error) {
 			console.log(error);
 		}
-	};
+    }
+
+    const handleEdit = async () => {
+        try {
+            await instance.patch(`/ads/edit/${adData?.id}`, formData);
+			navigate(`ads/${ adData?.id }`);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 	return (
 		<form onSubmit={handleSubmit}>
 			<div>
@@ -121,7 +148,8 @@ const CreateOrEditAd = () => {
 			</div>
 
 			<div>Tags</div>
-			<button type="submit">Create new ad</button>
+        
+			<button type="submit" className="bg-black text-white disabled:bg-gray-200" >  {editMode ? actionEdit : actionCreate }</button>
 		</form>
 	);
 };
