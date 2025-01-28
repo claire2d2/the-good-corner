@@ -28,3 +28,11 @@ export async function findAd(id: string) {
 
   return data;
 }
+
+export async function getLastAds() {
+  const { data } = await instance.get<ApiResponse<Ad[]>>(
+    "/ads/list?limit=5&order=DESC"
+  );
+
+  return data;
+}
