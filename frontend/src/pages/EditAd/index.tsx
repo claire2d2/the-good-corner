@@ -1,10 +1,13 @@
-import React from 'react'
+
+import CreateOrEditAd from "../../components/Forms/CreateOrEditAd"
 
 const EditAd = () => {
+
   return (
     <div>
-      
-    </div>
+			<h1>Edit ad</h1>
+			<CreateOrEditAd/>
+		</div>
   )
 }
 

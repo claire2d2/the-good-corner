@@ -11,6 +11,16 @@ export type Ad = {
     tags: Tag[]
 }
 
+export type AdCreate = {
+    title: string,
+    description: string,
+    price: float,
+    picture: string,
+    location: string,
+    categoryId : string,
+    tagsIds: string[]
+}
+
 export type Category = {
     id: string,
     title: string,

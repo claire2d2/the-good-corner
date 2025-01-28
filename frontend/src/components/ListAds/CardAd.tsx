@@ -15,7 +15,7 @@ const CardAd:React.FC<CardAdProps>  = ({ad}) => {
         <span>Price: </span>
         {ad.price}
         </div>
-        <Link to={`ads/${ad.id}`}>See details</Link>
+        <Link to={`ads/view/${ad.id}`}>See details</Link>
     </div>
   )
 }
