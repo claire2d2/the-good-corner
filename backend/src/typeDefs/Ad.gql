@@ -1,0 +1,11 @@
+type Ad {
+
+}
+
+type Query {
+
+}
+
+type Mutation {
+    
+}
