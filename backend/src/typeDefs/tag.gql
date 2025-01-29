@@ -1,0 +1,6 @@
+type Tag {
+    id: ID
+    label: String
+    created_at: String
+    updated_at: String
+}

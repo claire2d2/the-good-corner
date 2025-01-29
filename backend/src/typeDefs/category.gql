@@ -1,0 +1,7 @@
+type Category {
+    id: ID
+    title: String
+    ads: Ad[]
+    created_at: String
+    updated_at : String
+}

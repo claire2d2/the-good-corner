@@ -1,11 +1,24 @@
 type Ad {
-
+    id: ID
+    title: String
+    description: String
+    price: Float
+    picture: String
+    location: String
+    category: Category
+    tags: [Tag]
+    created_at: String
+    updated_at: String
 }
 
 type Query {
-
+    ads: [Ad]
 }
 
 type Mutation {
-    
+
 }
+
+
+
+  
